@@ -1,57 +1,54 @@
 /**
- * @OnlyCurrentDoc
- *
- * O código abaixo cexporta um intervalo de dados específico como um arquivo CSV.
- */
-
-/**
  * Função principal que é chamada pelo item de menu.
  * Ela define o intervalo, obtém os dados, converte para CSV e mostra o link para download.
  */
+
 function generateCsv() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    // --- CONFIGURAÇÕES ---
-  const linhaInicial = 5;      // Ex: A linha 2 (ignorando o cabeçalho na linha 1)
-  const colunaInicial = 1;     // Ex: A coluna A
-  const colunaFinal = 5;       // Ex: A coluna E
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getActiveSheet();
+  const sheetName = sheet.getName();
+  const ui = SpreadsheetApp.getUi();
+
+  if (sheetName !== 'CERTIFICADO') {
+    ui.alert('Erro: Esta função só pode ser executada na aba "CERTIFICADO".');
+    return;
+  }
+
+  // --- CONFIGURAÇÕES ---
+  const linhaInicial = 5;      
+  const colunaInicial = 1;     
+  const colunaFinal = 5;       
   const grupoDeFormacaoSelecionado = sheet.getRange("B1").getValue();
   const periodoInicial = sheet.getRange("B2").getValue();
   const periodoFinal = sheet.getRange("B3").getValue();
   // ---------------------
   
-  // Identifica dinamicamente a última linha que contém qualquer dado na aba.
   const ultimaLinha = sheet.getLastRow();
   
-  // Verifica se há dados para exportar (se a última linha com dados está abaixo da linha inicial).
   if (ultimaLinha < linhaInicial) {
     ui.alert('Não há dados para exportar no intervalo especificado.');
-    return; // Interrompe a execução do script
+    return; 
   }
   
-  // Calcula o número de linhas e colunas para o intervalo.
   const numLinhas = ultimaLinha - linhaInicial + 1;
   const numColunas = colunaFinal - colunaInicial + 1;
   
-  // Pega o intervalo de dados desejado.
   const range = sheet.getRange(linhaInicial, colunaInicial, numLinhas, numColunas);
-  
-  // Pega os valores do intervalo em formato de array 2D.
   const data = range.getValues();
   
-  // Converte os valores do intervalo em CSV
   const csvContentString = convertToCsvString(data);
-
-  // Converte a string UTF-8 para um array de bytes na codificação ANSI (Windows-1252)
   const ansiByteArray = convertToAnsiByteArray(csvContentString);
 
-  const dataAtual = getCurrentDate()
-  const nomeAbaAtualFormatado = formatarParaSlug(formatarParaSlug)
-  const grupoDeFormacaoSelecionadoFormatado = formatarParaSlug(grupoDeFormacaoSelecionado)
-  const periodoInicialFormatado = formatarMesParaAbreviatura(periodoInicial)
-  const periodoFinalFormatado = formatarMesParaAbreviatura(periodoFinal)
-  const fileName = `${dataAtual}${nomeAbaAtualFormatado}-${periodoInicialFormatado}-${periodoFinalFormatado}-${grupoDeFormacaoSelecionadoFormatado}.csv`;
+  const dataAtual = getCurrentDate('dd-MM-yyyy');
   
-  // Cria um "blob" (Binary Large Object) de texto com o conteúdo CSV.
+  const nomeAbaAtualFormatado = formatarParaSlug(sheetName);
+  
+  const grupoDeFormacaoSelecionadoFormatado = formatarParaSlug(grupoDeFormacaoSelecionado);
+  const periodoInicialFormatado = formatarMesParaAbreviatura(periodoInicial);
+  const periodoFinalFormatado = formatarMesParaAbreviatura(periodoFinal);
+  
+  const fileName = `${dataAtual}_${nomeAbaAtualFormatado}_${periodoInicialFormatado}-${periodoFinalFormatado}_${grupoDeFormacaoSelecionadoFormatado}.csv`;
+  
   const blob = Utilities.newBlob(ansiByteArray, 'text/csv', fileName);
   
   return {
@@ -60,6 +57,8 @@ function generateCsv() {
     fileExtension: 'csv'
   };
 }
+
+// ... (restante das funções auxiliares permanecem iguais)
 
 /**
  * Função auxiliar para converter um array 2D (de getValues()) em uma string CSV.
@@ -77,14 +76,6 @@ function convertToCsvString(data) {
       return cellString;
     }).join(';');
   }).join('\n');
-}
-
-function verificaStringVazia(texto) {
-  if (typeof texto !== 'string' || !texto.trim()) {
-    return "";
-  }
-
-  return texto
 }
 
 // =================================================================
@@ -145,19 +136,23 @@ function convertToAnsiByteArray(str) {
  * @returns {string} O texto formatado.
  */
 const formatarParaSlug = (texto) => {
-  // Retorna uma string vazia se a entrada for inválida.
   const textoVerificado = verificaStringVazia(texto)
 
   const textoFormatado = textoVerificado
     .toLowerCase()
-    // 1. Substitui um ou mais pontos e espaços por um único hífen.
     .replace(/[\. ]+/g, "-")
-    // 2. Remove hifens que possam ter ficado no início (^) ou no fim ($) da string.
     .replace(/^-+|-+$/g, "");
 
   return textoFormatado;
 };
 
+function verificaStringVazia(texto) {
+  if (typeof texto !== 'string' || !texto.trim()) {
+    return "";
+  }
+
+  return texto
+}
 
 function formatarMesParaAbreviatura(mes) {
   verificaStringVazia(mes)

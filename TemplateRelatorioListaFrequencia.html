@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 0.8cm;
+    }
+
+    body {
+      font-family: <?=theme.fontFamily ?>;
+      font-size: <?=theme.baseFontSize ?>;
+      line-height: 1.2;
+      -webkit-print-color-adjust: exact;
+      margin: 0;
+    }
+
+    .header {
+      width: 100%;
+      margin-bottom: 10px;
+      display: table;
+    }
+
+    .header-col {
+      display: table-cell;
+      vertical-align: middle;
+    }
+
+    .col-left {
+      width: 35%
+    }
+
+    .col-center {
+      width: 30%;
+      text-align: center;
+    }
+
+    .col-right {
+      width: 35%;
+      text-align: right;
+    }
+
+    .logo {
+      float: left;
+      width: 50px;
+      height: 50px;
+      margin-right: 10px;
+    }
+
+    .title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .row {
+      margin-bottom: 8px;
+      width: 100%;
+      clear: both;
+      font-size: 10px;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    .line {
+      border-bottom: 1px solid #000;
+      display: inline-block;
+      padding: 0 5px;
+      min-height: 14px;
+      vertical-align: bottom;
+    }
+
+    .date-slot {
+      border-bottom: 1px solid #000;
+      display: inline-block;
+      min-width: 25px;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 5px;
+      table-layout: fixed;
+    }
+
+    th {
+      background-color: <?=theme.headerColor ?> !important;
+      color: <?=theme.textColor ?>;
+      border: 1px solid #000;
+      padding: 5px;
+      font-size: 9px;
+    }
+
+    td {
+      border: 1px solid #000;
+      padding: 4px 6px;
+      text-align: center;
+      font-size: 9px;
+      height: 26px;
+      word-wrap: break-word;
+    }
+
+    .page-footer {
+      text-align: right;
+      font-size: 9px;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+
+    .page-break {
+      page-break-after: always;
+    }
+  </style>
+</head>
+
+<body>
+
+  <? 
+    // Configurações de Layout
+    const MAX_LINHAS_P1 = 14; 
+    const MAX_LINHAS_EXTRAS = 16; 
+    const EXTRAS_FIM = 10; 
+
+    // Preparação dos dados
+    let listaFinal = dados.map(dado => ({
+      nome: dado.nome, local: dado.local, cpf: dado.cpf, funcao: dado.funcao, obs: dado.obs
+    }));
+
+    // Injeção de linhas em branco obrigatórias
+    for (let i = 0; i < EXTRAS_FIM; i++) {
+      listaFinal.push({ nome: '', local: '', cpf: '', funcao: '', obs: '' });
+    }
+
+    let totalPaginas = 1;
+    if (listaFinal.length > MAX_LINHAS_P1) {
+      totalPaginas += Math.ceil((listaFinal.length - MAX_LINHAS_P1) / MAX_LINHAS_EXTRAS);
+    }
+
+    let cursor = 0;
+    for (let p = 0; p < totalPaginas; p++) { 
+      let isFirstPage = (p === 0);
+      let limite = isFirstPage ? MAX_LINHAS_P1 : MAX_LINHAS_EXTRAS;
+      let records = listaFinal.slice(cursor, cursor + limite);
+      cursor += limite;
+  ?>
+
+  <div class="header">
+    <div class="header-col col-left">
+      <img src="<?!= logo ?>" class="logo">
+      <div style="font-size: 9px">
+        <span class="bold">PREFEITURA DE SÃO JOSÉ</span><br>
+        <span class="bold">SECRETARIA MUNICIPAL DE EDUCAÇÃO</span><br>
+        <span class="bold">SETOR PEDAGÓGICO</span><br>
+        <span class="bold">CASA DO EDUCADOR</span>
+      </div>
+    </div>
+    <div class="header-col col-center">
+      <div class="title">LISTA DE FREQUÊNCIA</div>
+    </div>
+    <div class="header-col col-right">
+      <span class="bold">Grupo:</span>
+      <?= m.grupo ?><br>
+      <span class="bold">Unidade:</span>
+      <?= m.unidade ?>
+    </div>
+  </div>
+
+  <? if (isFirstPage) { ?>
+  <div class="row">
+    <span class="bold">Data da Formação:</span>
+    <span class="date-slot">&nbsp;</span>/
+    <span class="date-slot">&nbsp;</span>/
+    <span class="date-slot" style="min-width:40px">2026</span>
+
+    <span class="bold" style="margin-left:30px">Turno:</span> (   ) Matutino (   ) Vespertino (   ) Noturno
+    <span class="bold" style="margin-left:20px">Nº Servidores em sala:</span> MAT ____ VESP ____ NOT ____
+  </div>
+
+  <div class="row">
+    <span class="bold">Formador(a):</span> <span class="line" style="width:300px"></span>
+    <span class="bold" style="margin-left:20px">Representante SME:</span> <span class="line" style="width:300px"></span>
+  </div>
+  <? } ?>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:30%">NOME DO SERVIDOR</th>
+        <th style="width:25%">LOCAL DE TRABALHO</th>
+        <th style="width:5%">CPF</th>
+        <th style="width:10%">FUNÇÃO</th>
+        <th style="width:10%">ASSINATURA CHEGADA</th>
+        <th style="width:10%">ASSINATURA SAÍDA</th>
+        <th style="width:10%">OBS</th>
+      </tr>
+    </thead>
+    <tbody>
+      <? records.forEach(record => { ?>
+      <tr>
+        <td style="text-align:left">
+          <?!= record.nome || '&nbsp;' ?>
+        </td>
+        <td style="text-align:left">
+          <?!= record.local || '&nbsp;' ?>
+        </td>
+        <td>
+          <?!= record.cpf || '&nbsp;' ?>
+        </td>
+        <td>
+          <?!= record.funcao || '&nbsp;' ?>
+        </td>
+        <td></td>
+        <td></td>
+        <td>
+          <?!= record.obs || '&nbsp;' ?>
+        </td>
+      </tr>
+      <? }); ?>
+    </tbody>
+  </table>
+
+  <div class="page-footer">Página
+    <?= p + 1 ?> de
+    <?= totalPaginas ?>
+  </div>
+
+  <? if (p < totalPaginas - 1) { ?>
+  <div class="page-break"></div>
+  <? } ?>
+  <? } ?>
+
+</body>
+
+</html>

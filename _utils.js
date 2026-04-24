@@ -1,4 +1,51 @@
 /**
+ * Retorna a data e hora atuais formatadas de acordo com o fuso horário configurado no script.
+ * * Esta função é específica para o ambiente do Google Apps Script, pois utiliza as 
+ * classes nativas `Session` e `Utilities` para obter o fuso horário e formatar a data.
+ *
+ * @param {string} format - O padrão de formatação desejado para a data/hora. 
+ * Exemplos: "dd/MM/yyyy", "yyyy-MM-dd HH:mm:ss", "MMMM dd, yyyy".
+ * @returns {string} A string contendo a data e hora atuais no formato especificado.
+ */
+function getCurrentDate(format) {
+  const now = new Date();
+  const timeZone = Session.getScriptTimeZone();
+  const timestamp = Utilities.formatDate(now, timeZone, format);
+
+  return timestamp;
+}
+
+/**
+ * Preenche um intervalo de forma intercalada entre dois valores alvo.
+ * Colunas ímpares (dentro do intervalo) recebem o Valor A, 
+ * colunas pares recebem o Valor B.
+ */
+const preencherIntercaladoLote = () => {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getActiveSheet();
+  
+  // --- CONFIGURAÇÕES ---
+  const RANGE_ALVO = "F2:AS2929"; 
+  const VALOR_A = "P";
+  const VALOR_B = 3.50;
+  // ---------------------
+
+  const range = sheet.getRange(RANGE_ALVO);
+  const matrizDados = range.getValues();
+
+  const resultado = matrizDados.map((linha) => {
+    return linha.map((_, colIdx) => {
+      const isEvenColIdx = colIdx % 2 === 0
+      return (isEvenColIdx) ? VALOR_A : VALOR_B;
+    });
+  });
+
+  range.setValues(resultado);
+  
+  ss.toast("Preenchimento intercalado concluído!", "Status");
+};
+
+/**
  * Sincroniza dados entre dois arquivos diferentes.
  * Busca nomes com "E" no Arquivo de Origem e aplica o padrão E|0 no Arquivo de Destino.
  */
@@ -6,22 +53,18 @@ const sincronizarArquivosDistintos = () => {
   const ssDestino = SpreadsheetApp.getActiveSpreadsheet();
   const abaDestino = ssDestino.getActiveSheet();
   
-  // --- CONFIGURAÇÕES ---
-  // Substitua pelo ID do arquivo onde você busca os nomes (está na URL do navegador)
   const ID_ARQUIVO_ORIGEM = "1o-z5d6eV_Er3TcfnO20bdHi_IUYnspD-iDGeGYrFLNw"; 
   const NOME_ABA_ORIGEM = "DADOS"; 
   
-  const COLUNA_INICIO_DADOS = 6; // Coluna F
-  const COLUNA_FIM_DADOS = 45;   // Coluna AS
+  const COLUNA_INICIO_DADOS = 6;
+  const COLUNA_FIM_DADOS = 45;
   // ---------------------
 
   try {
-    // 1. Acessa o arquivo externo e extrai os dados
     const ssOrigem = SpreadsheetApp.openById(ID_ARQUIVO_ORIGEM);
     const abaOrigem = ssOrigem.getSheetByName(NOME_ABA_ORIGEM);
     const dadosOrigem = abaOrigem.getRange("A2:AS2929").getValues();
 
-    // 2. Identifica em memória quais nomes possuem "E" no intervalo de dados da origem
     const nomesComE = new Set(
       dadosOrigem
         .filter(linha => {
@@ -36,11 +79,9 @@ const sincronizarArquivosDistintos = () => {
       return;
     }
 
-    // 3. Lê os dados da planilha atual (Destino)
     const rangeDestino = abaDestino.getRange(2, 1, abaDestino.getLastRow() - 1, COLUNA_FIM_DADOS);
     const matrizDestino = rangeDestino.getValues();
 
-    // 4. Processa a matriz de destino comparando com o Set de nomes (Alta Performance)
     const resultadoFinal = matrizDestino.map(linha => {
       const nomeAtual = linha[0].toString().trim().toLowerCase();
       
@@ -54,7 +95,7 @@ const sincronizarArquivosDistintos = () => {
             linha[j] = "E";
             if (j + 1 < linha.length) {
               linha[j + 1] = 0;
-              j++; // Pula para a próxima já preenchida
+              j++;
             }
           }
         }
@@ -62,7 +103,6 @@ const sincronizarArquivosDistintos = () => {
       return linha;
     });
 
-    // 5. Grava as alterações de volta no destino
     rangeDestino.setValues(resultadoFinal);
     ssDestino.toast(`Sincronização concluída! ${nomesComE.size} nomes processados.`);
 

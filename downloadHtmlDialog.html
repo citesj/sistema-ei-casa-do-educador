@@ -19,26 +19,19 @@
     <p>Por favor, aguarde. O download começará em breve.</p>
 
     <script>
-      // Usa um scriptlet para injetar a variável do servidor no JavaScript do cliente.
       const TIPO_ARQUIVO = '<?= tipoArquivo ?>';
+      const ACAO_SERVIDOR = '<?= acaoServidor ?>';
 
-      /**
-       * Esta função é executada assim que o diálogo é carregado.
-       */
       window.onload = function() {
-        // 1. Define o título do diálogo dinamicamente.
-        const titleElement = document.getElementById('dialog-title');
-        titleElement.textContent = TIPO_ARQUIVO.toUpperCase() === 'PDF' 
-          ? 'Gerando seu PDF...' 
-          : 'Gerando seu arquivo CSV...';
+        document.getElementById('dialog-title').textContent = TIPO_ARQUIVO.toUpperCase() === 'PDF' 
+          ? 'Processando PDF...' 
+          : 'Processando CSV...';
 
-        // 2. Chama a função "roteadora" no servidor, passando o tipo de arquivo.
         google.script.run
           .withSuccessHandler(iniciarDownload)
           .withFailureHandler(falhaAoGerar)
-          .obterDadosDoArquivo(TIPO_ARQUIVO);
+          [ACAO_SERVIDOR](); 
       };
-
       /**
        * Esta função é chamada quando o servidor retorna os dados do arquivo com sucesso.
        * Ela é genérica e funciona para qualquer tipo de arquivo.

@@ -1,48 +1,54 @@
 /**
- * CONFIGURAÇÕES GERAIS
- * Ajuste estas variáveis de acordo com a sua planilha.
+ * Configurações globais para mapeamento da planilha.
+ * @type {Object}
+ * @property {string} NOME_ABA - Nome da aba alvo.
+ * @property {string} CELULA_MES_INICIO - Referência A1 da data inicial.
+ * @property {string} CELULA_MES_FIM - Referência A1 da data final.
+ * @property {number} LINHA_CABECALHO - Linha onde residem as siglas dos meses.
+ * @property {number} COLUNA_INTERVALO_INICIO - Primeira coluna do intervalo monitorado.
+ * @property {number} COLUNA_INTERVALO_FIM - Última coluna do intervalo monitorado.
  */
 const CONFIG = {
-  NOME_ABA: "CERTIFICADO",               // Nome da aba onde o script vai rodar
-  CELULA_MES_INICIO: "B2",          // Célula do menu suspenso (Mês Inicial)
-  CELULA_MES_FIM: "B3",             // Célula do menu suspenso (Mês Final)
-  LINHA_CABECALHO: 5,               // Linha onde estão os nomes dos meses (JAN, FEV...)
-  COLUNA_INTERVALO_INICIO: 6,       // Número da coluna onde começa o calendário (Ex: D = 4)
-  COLUNA_INTERVALO_FIM: 51          // Número da coluna onde termina o calendário (Ex: 12 meses * 4 colunas = 48 + offset)
+  NOME_ABA: "CERTIFICADO",
+  CELULA_MES_INICIO: "B2",
+  CELULA_MES_FIM: "B3",
+  LINHA_CABECALHO: 5,
+  COLUNA_INTERVALO_INICIO: 6,
+  COLUNA_INTERVALO_FIM: 51
 };
 
 /**
- * Função gatilho que roda automaticamente ao editar a planilha.
+ * Monitora edições na planilha e dispara a atualização de visibilidade se as células de data forem alteradas.
+ * * @param {GoogleAppsScript.Events.SheetsOnEdit} e - Objeto de evento do gatilho onEdit.
+ * @returns {void}
  */
 function verificaEdicaoAbaCertificado(e) {
   const range = e.range;
   const sheet = range.getSheet();
   
-  // Verificações de segurança para garantir performance (fail-fast)
   if (sheet.getName() !== CONFIG.NOME_ABA) return;
   
   const celulaEditada = range.getA1Notation();
   
-  // Só roda se a edição for em um dos campos de data
   if (celulaEditada === CONFIG.CELULA_MES_INICIO || celulaEditada === CONFIG.CELULA_MES_FIM) {
     atualizarVisibilidadeColunas(sheet);
   }
 }
 
 /**
- * Função principal que orquestra a lógica.
+ * Orquestra a lógica de identificação do intervalo de meses e define quais colunas devem ser exibidas.
+ * Captura os valores de início e fim, localiza-os no cabeçalho e calcula a expansão para colunas extras (FREQ/AC).
+ * * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet - A instância da aba ativa.
+ * @returns {void}
  */
 function atualizarVisibilidadeColunas(sheet) {
-  // 1. Desestruturação e leitura inicial
   const [valorInicio, valorFim] = sheet.getRange(`${CONFIG.CELULA_MES_INICIO}:${CONFIG.CELULA_MES_FIM}`).getValues().flat();
 
-  // Fail-fast com validação moderna
   if (!valorInicio || !valorFim) return;
 
-  const DATA_INICIO_ABREVIADO = formatarMes(valorInicio);
-  const DATA_FINAL_ABREVIADO = formatarMes(valorFim);
+  const DATA_INICIO_ABREVIADO = formatarSiglaMes(valorInicio);
+  const DATA_FINAL_ABREVIADO = formatarSiglaMes(valorFim);
 
-  // 2. Obtenção do cabeçalho
   const totalColunas = CONFIG.COLUNA_INTERVALO_FIM - CONFIG.COLUNA_INTERVALO_INICIO + 1;
   const valoresCabecalho = sheet.getRange(
     CONFIG.LINHA_CABECALHO, 
@@ -51,55 +57,65 @@ function atualizarVisibilidadeColunas(sheet) {
     totalColunas
   ).getValues()[0];
 
-  // 3. Identificação de índices (Imutabilidade com const)
   const indexRelativoInicio = valoresCabecalho.indexOf(DATA_INICIO_ABREVIADO);
   const indexBaseFim = valoresCabecalho.lastIndexOf(DATA_FINAL_ABREVIADO);
 
   if (indexRelativoInicio === -1 || indexBaseFim === -1) {
-    SpreadsheetApp.getActiveSpreadsheet().toast("Mês não encontrado.", "Erro");
+    SpreadsheetApp.getActiveSpreadsheet().toast("Mês não encontrado no cabeçalho.", "Erro");
     return;
   }
 
-  // 4. Lógica de Expansão
-  // Calculamos se deve haver expansão para incluir FREQ (+1) e possivelmente AC (+2)
   const temAC = valoresCabecalho[indexBaseFim + 2] === "AC";
   const expansaoFinal = temAC ? 2 : 1;
 
   const colunaInicialAlvo = CONFIG.COLUNA_INTERVALO_INICIO + indexRelativoInicio;
   const colunaFinalAlvo = CONFIG.COLUNA_INTERVALO_INICIO + indexBaseFim + expansaoFinal;
 
-  // 5. Validação e Execução
   if (colunaFinalAlvo < colunaInicialAlvo) {
-    SpreadsheetApp.getActiveSpreadsheet().toast("Intervalo inválido.", "Aviso");
+    SpreadsheetApp.getActiveSpreadsheet().toast("Intervalo de datas inválido.", "Aviso");
     return;
   }
 
-  aplicarOcultamentoInteligente(sheet, colunaInicialAlvo, colunaFinalAlvo);
+  gerenciarVisibilidadeColunas(sheet, colunaInicialAlvo, colunaFinalAlvo);
 }
 
 /**
- * Função utilitária para formatar a string do mês.
+ * Normaliza e formata um valor para uma sigla de mês com 3 caracteres.
+ * Remove acentos e converte para caixa alta.
+ * * @param {string|Date|number} valor - O dado bruto (data ou string) a ser convertido.
+ * @returns {string} Sigla formatada (ex: "JAN", "ABR", "DEZ").
  */
-const formatarMes = (valor) => 
-  String(valor ?? "").trim().substring(0, 3).toUpperCase();
+const formatarSiglaMes = (valor) => {
+  if (valor instanceof Date) {
+    return valor.toLocaleString('pt-BR', { month: 'short' }).toUpperCase().substring(0, 3);
+  }
+
+  return String(valor ?? "")
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .substring(0, 3)
+    .toUpperCase();
+};
 
 /**
- * Lógica para ocultar/mostrar colunas.
- * Estratégia: Resetar (mostrar tudo) é lento se feito coluna por coluna.
- * Melhor estratégia: Mostrar o intervalo desejado e ocultar as "asas" (esquerda e direita).
+ * Executa as chamadas de API para ocultar ou exibir colunas com base nos índices calculados.
+ * Utiliza uma estratégia de "asas" para minimizar operações de escrita na planilha.
+ * * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet - Aba onde a visibilidade será alterada.
+ * @param {number} colInicioVisivel - Índice da coluna inicial que deve ficar visível.
+ * @param {number} colFimVisivel - Índice da coluna final que deve ficar visível (incluindo expansões).
+ * @returns {void}
  */
-function aplicarOcultamentoInteligente(sheet, colInicioVisivel, colFimVisivel) {
-  // Primeiro, garante que o intervalo desejado está visível
+function gerenciarVisibilidadeColunas(sheet, colInicioVisivel, colFimVisivel) {
   const numColunasVisiveis = colFimVisivel - colInicioVisivel + 1;
+  
   sheet.showColumns(colInicioVisivel, numColunasVisiveis);
 
-  // Lógica da Esquerda: Ocultar do início do calendário até antes do início visível
   if (colInicioVisivel > CONFIG.COLUNA_INTERVALO_INICIO) {
     const numColunasOcultarEsq = colInicioVisivel - CONFIG.COLUNA_INTERVALO_INICIO;
     sheet.hideColumns(CONFIG.COLUNA_INTERVALO_INICIO, numColunasOcultarEsq);
   }
 
-  // Lógica da Direita: Ocultar de depois do fim visível até o final do calendário
   if (colFimVisivel < CONFIG.COLUNA_INTERVALO_FIM) {
     const inicioOcultarDir = colFimVisivel + 1;
     const numColunasOcultarDir = CONFIG.COLUNA_INTERVALO_FIM - colFimVisivel;
