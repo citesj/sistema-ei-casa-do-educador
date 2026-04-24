@@ -1,0 +1,33 @@
+# Node deps
+node_modules/
+
+# Build output
+dist/
+bundle.js
+
+# clasp / Google Apps Script
+.clasp.json
+.clasprc.json
+
+# Env / secrets
+.env
+.env.* 
+*.key
+*.pem
+*-credentials.json
+service-account-*.json
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+.nyc_output/
