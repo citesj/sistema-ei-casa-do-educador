@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding-top: 20px;
+        color: #333;
+      }
+      h3 {
+        font-weight: 500;
+      }
+    </style>
+  </head>
+  <body>
+    <h3 id="dialog-title"></h3>
+    <p>Por favor, aguarde. O download começará em breve.</p>
+
+    <script>
+      // Usa um scriptlet para injetar a variável do servidor no JavaScript do cliente.
+      const TIPO_ARQUIVO = '<?= tipoArquivo ?>';
+
+      /**
+       * Esta função é executada assim que o diálogo é carregado.
+       */
+      window.onload = function() {
+        // 1. Define o título do diálogo dinamicamente.
+        const titleElement = document.getElementById('dialog-title');
+        titleElement.textContent = TIPO_ARQUIVO.toUpperCase() === 'PDF' 
+          ? 'Gerando seu PDF...' 
+          : 'Gerando seu arquivo CSV...';
+
+        // 2. Chama a função "roteadora" no servidor, passando o tipo de arquivo.
+        google.script.run
+          .withSuccessHandler(iniciarDownload)
+          .withFailureHandler(falhaAoGerar)
+          .obterDadosDoArquivo(TIPO_ARQUIVO);
+      };
+
+      /**
+       * Esta função é chamada quando o servidor retorna os dados do arquivo com sucesso.
+       * Ela é genérica e funciona para qualquer tipo de arquivo.
+       * @param {Object} fileObject O objeto retornado pelo servidor: {fileData, fileName, fileExtension}.
+       */
+      function iniciarDownload(fileObject) {
+        // 3. Define o MIME type dinamicamente com base na extensão do arquivo.
+        let mimeType;
+        if (fileObject.fileExtension === 'pdf') {
+          mimeType = 'application/pdf';
+        } else if (fileObject.fileExtension === 'csv') {
+          mimeType = 'text/csv';
+        } else {
+          // Fallback para dados binários genéricos
+          mimeType = 'application/octet-stream';
+        }
+        
+        // Cria um elemento de link <a> invisível
+        const link = document.createElement("a");
+        link.style.display = 'none';
+        
+        // Define o conteúdo do link com o MIME type correto e os dados em Base64
+        link.href = "data:" + mimeType + ";base64," + fileObject.fileData;
+        
+        // Define o nome do arquivo para o download
+        link.download = fileObject.fileName;
+        
+        // Adiciona o link ao corpo do documento, clica e o remove.
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Fecha o diálogo.
+        google.script.host.close();
+      }
+
+      /**
+       * Esta função é chamada se ocorrer um erro no servidor.
+       * @param {Error} error O objeto de erro retornado pelo servidor.
+       */
+      function falhaAoGerar(error) {
+        alert("Falha ao gerar o arquivo: " + error.message);
+        google.script.host.close();
+      }
+    </script>
+  </body>
+</html>

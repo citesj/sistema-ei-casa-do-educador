@@ -1,0 +1,22 @@
+{
+  "name": "sistema-ei-casa-do-educador",
+  "version": "1.0.0",
+  "description": "scripts utilizados no GAS para auxiliar na planilha da Casa do Educador do Ensino Infantil",
+  "homepage": "https://github.com/citesj/sistema-ei-casa-do-educador#readme",
+  "bugs": {
+    "url": "https://github.com/citesj/sistema-ei-casa-do-educador/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/citesj/sistema-ei-casa-do-educador.git"
+  },
+  "license": "ISC",
+  "author": "Eduardo Henrique Lisboa Silva",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "build": "node build.js",
+    "clasp:upload": "npm run build && clasp push --force",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
