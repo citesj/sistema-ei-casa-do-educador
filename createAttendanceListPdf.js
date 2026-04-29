@@ -75,31 +75,46 @@ function extrairMetadadosEssenciais(sheet) {
 }
 
 /**
- * Extrai os dados da tabela filtrando linhas inválidas.
- * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet
- * @returns {Array<Object>} Lista de servidores formatada.
+ * Extrai os dados da tabela filtrando linhas inválidas e formatando quebras de linha nos locais.
+ * * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet - A aba "LISTA FREQUÊNCIA".
+ * @returns {Array<Object>} Lista de servidores com dados tratados.
  */
 function extrairDadosFrequencia(sheet) {
   const ultimaLinha = sheet.getLastRow();
   const { LINHA_INICIAL, COLUNA_INICIAL, NUM_COLUNAS } = CONFIG_LISTA.TABELA;
 
-  if (ultimaLinha < LINHA_INICIAL) return [];
+  if (ultimaLinha < LINHA_INICIAL) {
+    return [];
+  }
 
-  const numLinhas = (ultimaLinha - LINHA_INICIAL) + 1;
-  const rawData = sheet.getRange(LINHA_INICIAL, COLUNA_INICIAL, numLinhas, NUM_COLUNAS).getDisplayValues();
+  const numLinhasParaLer = (ultimaLinha - LINHA_INICIAL) + 1;
+  const matrizDadosBrutos = sheet
+    .getRange(LINHA_INICIAL, COLUNA_INICIAL, numLinhasParaLer, NUM_COLUNAS)
+    .getDisplayValues();
 
-  return rawData
-    .filter(linha => {
-      const nome = linha[CONFIG_LISTA.COLUNAS.NOME].trim();
-      return nome !== "" && !nome.includes(CONFIG_LISTA.STRINGS.PLACEHOLDER_VAZIO);
-    })
-    .map(linha => ({
+  const registrosValidos = matrizDadosBrutos.filter(linha => {
+    const nomeServidor = linha[CONFIG_LISTA.COLUNAS.NOME].trim();
+    const possuiNome = nomeServidor !== "";
+    const naoEhPlaceholder = !nomeServidor.includes(CONFIG_LISTA.STRINGS.PLACEHOLDER_VAZIO);
+    
+    return possuiNome && naoEhPlaceholder;
+  });
+
+  const registrosFormatados = registrosValidos.map(linha => {
+    const localOriginal = linha[CONFIG_LISTA.COLUNAS.LOCAL];
+    
+    const localComQuebraDeLinha = localOriginal.replace(/\n/g, '<br>');
+
+    return {
       nome: linha[CONFIG_LISTA.COLUNAS.NOME],
-      local: linha[CONFIG_LISTA.COLUNAS.LOCAL],
+      local: localComQuebraDeLinha,
       cpf: linha[CONFIG_LISTA.COLUNAS.CPF],
       funcao: linha[CONFIG_LISTA.COLUNAS.FUNCAO],
       obs: linha[CONFIG_LISTA.COLUNAS.OBSERVACAO]
-    }));
+    };
+  });
+
+  return registrosFormatados;
 }
 
 /**
