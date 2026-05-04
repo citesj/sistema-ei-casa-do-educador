@@ -2,7 +2,7 @@
  * CONFIGURAÇÕES GLOBAIS DE MAPEAMENTO
  * Centraliza as coordenadas para evitar Magic Numbers e facilitar manutenção.
  */
-const CONFIG_LISTA = {
+const CONFIG_LISTA_FREQUENCIA = {
   // Coordenadas das células (Índices 1-based para Range)
   CELULAS: {
     GRUPO: "E1",
@@ -63,8 +63,8 @@ function createAttendancePdf() {
  * @returns {Object} Objeto com nomes limpos.
  */
 function extrairMetadadosEssenciais(sheet) {
-  const rangeGrupo = sheet.getRange(CONFIG_LISTA.CELULAS.GRUPO).getDisplayValue();
-  const rangeUnidade = sheet.getRange(CONFIG_LISTA.CELULAS.UNIDADE).getDisplayValue();
+  const rangeGrupo = sheet.getRange(CONFIG_LISTA_FREQUENCIA.CELULAS.GRUPO).getDisplayValue();
+  const rangeUnidade = sheet.getRange(CONFIG_LISTA_FREQUENCIA.CELULAS.UNIDADE).getDisplayValue();
 
   const limpar = (txt) => txt.split(':').pop().trim();
 
@@ -81,7 +81,7 @@ function extrairMetadadosEssenciais(sheet) {
  */
 function extrairDadosFrequencia(sheet) {
   const ultimaLinha = sheet.getLastRow();
-  const { LINHA_INICIAL, COLUNA_INICIAL, NUM_COLUNAS } = CONFIG_LISTA.TABELA;
+  const { LINHA_INICIAL, COLUNA_INICIAL, NUM_COLUNAS } = CONFIG_LISTA_FREQUENCIA.TABELA;
 
   if (ultimaLinha < LINHA_INICIAL) {
     return [];
@@ -93,24 +93,24 @@ function extrairDadosFrequencia(sheet) {
     .getDisplayValues();
 
   const registrosValidos = matrizDadosBrutos.filter(linha => {
-    const nomeServidor = linha[CONFIG_LISTA.COLUNAS.NOME].trim();
+    const nomeServidor = linha[CONFIG_LISTA_FREQUENCIA.COLUNAS.NOME].trim();
     const possuiNome = nomeServidor !== "";
-    const naoEhPlaceholder = !nomeServidor.includes(CONFIG_LISTA.STRINGS.PLACEHOLDER_VAZIO);
+    const naoEhPlaceholder = !nomeServidor.includes(CONFIG_LISTA_FREQUENCIA.STRINGS.PLACEHOLDER_VAZIO);
     
     return possuiNome && naoEhPlaceholder;
   });
 
   const registrosFormatados = registrosValidos.map(linha => {
-    const localOriginal = linha[CONFIG_LISTA.COLUNAS.LOCAL];
+    const localOriginal = linha[CONFIG_LISTA_FREQUENCIA.COLUNAS.LOCAL];
     
     const localComQuebraDeLinha = localOriginal.replace(/\n/g, '<br>');
 
     return {
-      nome: linha[CONFIG_LISTA.COLUNAS.NOME],
+      nome: linha[CONFIG_LISTA_FREQUENCIA.COLUNAS.NOME],
       local: localComQuebraDeLinha,
-      cpf: linha[CONFIG_LISTA.COLUNAS.CPF],
-      funcao: linha[CONFIG_LISTA.COLUNAS.FUNCAO],
-      obs: linha[CONFIG_LISTA.COLUNAS.OBSERVACAO]
+      cpf: linha[CONFIG_LISTA_FREQUENCIA.COLUNAS.CPF],
+      funcao: linha[CONFIG_LISTA_FREQUENCIA.COLUNAS.FUNCAO],
+      obs: linha[CONFIG_LISTA_FREQUENCIA.COLUNAS.OBSERVACAO]
     };
   });
 
@@ -135,5 +135,5 @@ function montarHtmlLista(metadados, registros) {
 function converterParaPdf(html, unidade) {
   const blob = Utilities.newBlob(html, MimeType.HTML).getAs(MimeType.PDF);
   const data = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd-MM-yyyy_HH-mm");
-  return blob.setName(`${data}_${CONFIG_LISTA.STRINGS.PREFIXO_ARQUIVO}.pdf`);
+  return blob.setName(`${data}_${CONFIG_LISTA_FREQUENCIA.STRINGS.PREFIXO_ARQUIVO}.pdf`);
 }
