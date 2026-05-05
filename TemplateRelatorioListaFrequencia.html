@@ -104,11 +104,30 @@
       word-wrap: break-word;
     }
 
+    /* Novos estilos para o rodapé dividido */
     .page-footer {
+      width: 100%;
+      margin-top: 8px;
+      display: table;
+    }
+
+    .footer-units {
+      display: table-cell;
+      text-align: left;
+      font-style: italic;
+      color: #333;
+      font-size: 8px;
+      width: 85%;
+      vertical-align: bottom;
+    }
+
+    .footer-page {
+      display: table-cell;
       text-align: right;
       font-size: 9px;
-      margin-top: 8px;
       font-weight: bold;
+      width: 15%;
+      vertical-align: bottom;
     }
 
     .page-break {
@@ -124,6 +143,10 @@
     const MAX_LINHAS_P1 = 14; 
     const MAX_LINHAS_EXTRAS = 16; 
     const EXTRAS_FIM = 10; 
+
+    // Tratamento da exibição da Unidade
+    let isMultipla = m.unidade && m.unidade.includes(',');
+    let displayUnidade = isMultipla ? 'Múltiplas Unidades (ver rodapé)' : m.unidade;
 
     // Preparação dos dados
     let listaFinal = dados.map(dado => ({
@@ -165,7 +188,7 @@
       <span class="bold">Grupo:</span>
       <?= m.grupo ?><br>
       <span class="bold">Unidade:</span>
-      <?= m.unidade ?>
+      <?= displayUnidade ?>
     </div>
   </div>
 
@@ -223,9 +246,15 @@
     </tbody>
   </table>
 
-  <div class="page-footer">Página
-    <?= p + 1 ?> de
-    <?= totalPaginas ?>
+  <div class="page-footer">
+    <div class="footer-units">
+      <? if (isMultipla) { ?>
+        Unidades filtradas: <?= m.unidade ?>
+      <? } ?>
+    </div>
+    <div class="footer-page">
+      Página <?= p + 1 ?> de <?= totalPaginas ?>
+    </div>
   </div>
 
   <? if (p < totalPaginas - 1) { ?>
