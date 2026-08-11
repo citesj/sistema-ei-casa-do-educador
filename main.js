@@ -15,17 +15,26 @@ function onOpen() {
   //   .addToUi();
 }
 
+const roteadorAbas = {
+  'DADOS': (e) => {
+    if (typeof processarStatusFrequencia === 'function') {
+      processarStatusFrequencia(e);
+    }
+  },
+  'LISTA FREQUÊNCIA': (e) => processarListaFrequencia(e)
+};
+
 function onEdit(e) {
+  if (!e || !e.range) return;
+
   try {
     const nomeAba = e.range.getSheet().getName();
+    const acao = roteadorAbas[nomeAba];
 
-    if (!['DADOS'].includes(nomeAba)) {
-      return;
+    if (acao) {
+      acao(e);
     }
-
-    processarStatusFrequencia(e);
-
   } catch (error) {
-    console.error(`Erro no controlador onEdit: ${error.message}`);
+    console.error(`Erro: ${error.message}`);
   }
 }
