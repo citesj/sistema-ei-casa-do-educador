@@ -104,20 +104,36 @@
       word-wrap: break-word;
     }
 
-    /* Novos estilos para o rodapé dividido */
     .page-footer {
       width: 100%;
       margin-top: 8px;
       display: table;
     }
 
-    .footer-units {
+    .footer-info {
       display: table-cell;
       text-align: left;
       font-style: italic;
       color: #333;
       font-size: 8px;
       width: 85%;
+      vertical-align: bottom;
+    }
+
+    .footer-units {
+      text-align: left;
+      font-style: italic;
+      color: #333;
+      font-size: 8px;
+      vertical-align: bottom;
+      margin-bottom: 2px;
+    }
+
+    .footer-roles {
+      text-align: left;
+      font-style: italic;
+      color: #333;
+      font-size: 8px;
       vertical-align: bottom;
     }
 
@@ -145,8 +161,12 @@
     const EXTRAS_FIM = 10; 
 
     // Tratamento da exibição da Unidade
-    let isMultipla = m.unidade && m.unidade.includes(',');
-    let displayUnidade = isMultipla ? 'Múltiplas Unidades (ver rodapé)' : m.unidade;
+    let isUnidadeMultiSelected = m.unidade && m.unidade.includes(',');
+    let displayUnidade = isUnidadeMultiSelected ? 'Múltiplas Unidades (ver rodapé)' : m.unidade;
+
+    // Tratamento da exibição do filtro de função
+    let isRoleFilterMultiSelected = m.funcao && m.funcao.includes(',')
+    let displayFuncao = isRoleFilterMultiSelected ? 'Múltiplas Funções (ver rodapé)' : m.funcao;
 
     // Preparação dos dados
     let listaFinal = dados.map(dado => ({
@@ -188,7 +208,9 @@
       <span class="bold">Grupo:</span>
       <?= m.grupo ?><br>
       <span class="bold">Unidade:</span>
-      <?= displayUnidade ?>
+      <?= displayUnidade ?><br>  
+      <span class="bold">Função:</span>
+      <?= displayFuncao ?>
     </div>
   </div>
 
@@ -247,10 +269,17 @@
   </table>
 
   <div class="page-footer">
-    <div class="footer-units">
-      <? if (isMultipla) { ?>
-        Unidades filtradas: <?= m.unidade ?>
-      <? } ?>
+    <div class="footer-info">
+      <div class="footer-units">
+        <? if (isUnidadeMultiSelected) { ?>
+          Unidades filtradas: <?= m.unidade ?>
+        <? } ?>
+      </div>
+      <div class="footer-roles">
+        <? if (isRoleFilterMultiSelected) { ?>
+          Unidades filtradas: <?= m.funcao ?>
+        <? } ?>
+      </div>
     </div>
     <div class="footer-page">
       Página <?= p + 1 ?> de <?= totalPaginas ?>

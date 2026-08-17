@@ -6,11 +6,12 @@ const CONFIG_LISTA_FREQUENCIA = {
   // Coordenadas das células (Índices 1-based para Range)
   CELULAS: {
     GRUPO: "E1",
-    UNIDADE: "E2"
+    UNIDADE: "E2",
+    FUNCAO: "E3"
   },
   // Estrutura da Tabela de Dados
   TABELA: {
-    LINHA_INICIAL: 7,
+    LINHA_INICIAL: 6,
     COLUNA_INICIAL: 1,
     NUM_COLUNAS: 7
   },
@@ -58,19 +59,21 @@ function createAttendancePdf() {
 }
 
 /**
- * Captura apenas Grupo e Unidade (conforme solicitado).
+ * Captura dados referente aos filtros selecionados.
  * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet
  * @returns {Object} Objeto com nomes limpos.
  */
 function extrairMetadadosEssenciais(sheet) {
   const rangeGrupo = sheet.getRange(CONFIG_LISTA_FREQUENCIA.CELULAS.GRUPO).getDisplayValue();
   const rangeUnidade = sheet.getRange(CONFIG_LISTA_FREQUENCIA.CELULAS.UNIDADE).getDisplayValue();
+  const rangeFuncao = sheet.getRange(CONFIG_LISTA_FREQUENCIA.CELULAS.FUNCAO).getDisplayValue();
 
   const limpar = (txt) => txt.split(':').pop().trim();
 
   return {
     grupo: limpar(rangeGrupo),
-    unidade: limpar(rangeUnidade)
+    unidade: limpar(rangeUnidade),
+    funcao: limpar(rangeFuncao)
   };
 }
 
