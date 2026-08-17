@@ -160,6 +160,9 @@
     const MAX_LINHAS_EXTRAS = 16; 
     const EXTRAS_FIM = 10; 
 
+    // Constantes
+    const ANO_ATUAL = new Date().getFullYear()
+
     // Tratamento da exibição da Unidade
     let isUnidadeMultiSelected = m.unidade && m.unidade.includes(',');
     let displayUnidade = isUnidadeMultiSelected ? 'Múltiplas Unidades (ver rodapé)' : m.unidade;
@@ -219,7 +222,7 @@
     <span class="bold">Data da Formação:</span>
     <span class="date-slot">&nbsp;</span>/
     <span class="date-slot">&nbsp;</span>/
-    <span class="date-slot" style="min-width:40px">2026</span>
+    <span class="date-slot" style="min-width:40px"><?= ANO_ATUAL ?></span>
 
     <span class="bold" style="margin-left:30px">Turno:</span> (   ) Matutino (   ) Vespertino (   ) Noturno
     <span class="bold" style="margin-left:20px">Nº Servidores em sala:</span> MAT ____ VESP ____ NOT ____
