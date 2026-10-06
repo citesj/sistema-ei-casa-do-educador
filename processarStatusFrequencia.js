@@ -9,21 +9,35 @@
  * @property {Set<string>} DADOS.MANUAL_STATUSES - Conjunto de status ('SA', 'CT') que exigem digitação manual da frequência.
  * @property {Set<number|string>} DADOS.CLEAR_VALUES - Valores que devem ser limpos da célula de frequência caso um status manual seja selecionado.
  */
-const QUANTIDADE_COLUNAS_STATUS = 45;
+const QUANTIDADE_COLUNAS_STATUS = 44;
 const PRIMEIRA_COLUNA_STATUS = 6;
 const INTERVALO_COLUNAS_STATUS = 2;
-const COLUNAS_COM_AJUSTE_STATUS = new Set([46, 95]);
+const COLUNAS_COM_AJUSTE_STATUS = new Set([46]);
 const PRIMEIRA_LINHA_DADOS = 2;
 const COLUNA_FREQUENCIA_RELATIVA = 1;
 const FREQUENCIA_PRESENCA = 3.5;
 const FREQUENCIA_ZERO = 0;
 
+const gerarColunasStatus = () => {
+  const colunas = [];
+  let coluna = PRIMEIRA_COLUNA_STATUS;
+
+  while (colunas.length < QUANTIDADE_COLUNAS_STATUS) {
+    if (COLUNAS_COM_AJUSTE_STATUS.has(coluna)) {
+      coluna += 1;
+      continue;
+    }
+
+    colunas.push(coluna);
+    coluna += INTERVALO_COLUNAS_STATUS;
+  }
+
+  return colunas;
+};
+
 const CONFIG_CACHE = {
   DADOS: {
-    COLUNAS_STATUS: new Set(Array.from({ length: QUANTIDADE_COLUNAS_STATUS }, (_, indice) => {
-      const coluna = PRIMEIRA_COLUNA_STATUS + indice * INTERVALO_COLUNAS_STATUS;
-      return COLUNAS_COM_AJUSTE_STATUS.has(coluna) ? coluna + COLUNA_FREQUENCIA_RELATIVA : coluna;
-    })),
+    COLUNAS_STATUS: new Set(gerarColunasStatus()),
     PRIMEIRA_LINHA_DADOS,
     STATUS_MAP: new Map([
       ['P', FREQUENCIA_PRESENCA],
