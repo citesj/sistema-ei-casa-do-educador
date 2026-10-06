@@ -21,7 +21,8 @@ const roteadorAbas = {
       processarStatusFrequencia(e);
     }
   },
-  'LISTA FREQUÊNCIA': (e) => processarListaFrequencia(e)
+  'LISTA FREQUÊNCIA': (e) => processarListaFrequencia(e),
+  'CERTIFICADO': (e) => verificaEdicaoAbaCertificado(e)
 };
 
 function onEdit(e) {
