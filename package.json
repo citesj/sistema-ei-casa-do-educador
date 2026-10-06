@@ -18,5 +18,8 @@
     "build": "node build.js",
     "clasp:upload": "npm run build && clasp push --force",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@google/clasp": "^3.4.1"
   }
 }
