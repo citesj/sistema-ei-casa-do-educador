@@ -3,7 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <style>
-    @page { size: A4 landscape; margin: 0.8cm; }
+    * {
+      box-sizing: border-box;
+    }
+
+    @page { 
+      size: A4 landscape; 
+      margin: 0.5cm; 
+    }
     
     body { 
       font-family: <?= theme.fontFamily ?>; 
@@ -11,45 +18,69 @@
       line-height: 1.2; 
       -webkit-print-color-adjust: exact; 
       margin: 0;
+      padding: 0;
+      width: 100%;
     }
     
     /* Cabeçalho Institucional */
-    .header { width: 100%; margin-bottom: 10px; display: table; }
+    .header { width: 100%; margin-bottom: 8px; display: table; }
     .header-col { display: table-cell; vertical-align: middle; }
     .col-left { width: 35%; }
     .col-center { width: 30%; text-align: center; }
     .col-right { width: 35%; text-align: right; }
-    .logo { float: left; width: 50px; height: 50px; margin-right: 10px; }
-    .title { font-size: 13px; font-weight: bold; }
+    .logo { float: left; width: 48px; height: 48px; margin-right: 8px; }
+    .title { font-size: 12px; font-weight: bold; }
     
     /* Metadados */
-    .meta-box { margin-bottom: 8px; font-size: 10px; }
+    .meta-box { margin-bottom: 6px; font-size: 9.5px; }
     .bold { font-weight: bold; }
     
     /* Tabela de Dados */
-    table.data-table { width: 100%; border-collapse: collapse; margin-top: 5px; table-layout: fixed; }
-    table.data-table th { background-color: <?= theme.headerColor ?> !important; color: <?= theme.textColor ?>; border: 1px solid #000; padding: 4px; font-size: 8px; }
-    table.data-table td { border: 1px solid #000; padding: 4px; text-align: center; font-size: 8px; height: 22px; word-wrap: break-word; }
+    table.data-table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-top: 4px; 
+      table-layout: fixed; 
+    }
+    table.data-table th { 
+      background-color: <?= theme.headerColor ?> !important; 
+      color: <?= theme.textColor ?>; 
+      border: 1px solid #000; 
+      padding: 3px 1px; 
+      font-size: 7px; 
+      line-height: 1.1;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    table.data-table td { 
+      border: 1px solid #000; 
+      padding: 2px 1px; 
+      text-align: center; 
+      font-size: 7px; 
+      height: 20px; 
+      word-wrap: break-word; 
+      overflow-wrap: break-word;
+    }
     
-    /* Seção de Assinaturas (Agora em cada página) */
+    /* Seção de Assinaturas */
     .signature-section { 
       width: 100%; 
       border-collapse: collapse; 
-      margin-top: 15px; 
+      margin-top: 12px; 
       page-break-inside: avoid; 
     }
     .sig-cell {
       width: 50%;
       border: 1px solid #000;
       vertical-align: bottom;
-      padding: 10px;
-      height: 95px;
+      padding: 8px;
+      height: 85px;
       text-align: center;
-      font-size: 9px;
+      font-size: 8.5px;
     }
-    .sig-image { max-height: 60px; width: auto; display: block; margin: 0 auto 5px auto; }
+    .sig-image { max-height: 50px; width: auto; display: block; margin: 0 auto 4px auto; }
     
-    .page-footer { text-align: right; font-size: 9px; margin-top: 5px; font-weight: bold; }
+    .page-footer { text-align: right; font-size: 8.5px; margin-top: 4px; font-weight: bold; }
     .page-break { page-break-after: always; }
   </style>
 </head>
@@ -79,7 +110,7 @@
   <div class="header">
     <div class="header-col col-left">
       <img src="<?!= logo ?>" class="logo">
-      <div style="font-size: 9px;">
+      <div style="font-size: 8.5px;">
           <span class="bold">PREFEITURA DE SÃO JOSÉ</span><br>
           <span class="bold">SECRETARIA MUNICIPAL DE EDUCAÇÃO</span><br>
           <span class="bold">SETOR PEDAGÓGICO</span><br>
@@ -87,7 +118,7 @@
       </div>
     </div>
     <div class="header-col col-center">
-      <div class="title">RELATORIO DE FALTAS NA FORMAÇÃO CONTINUADA<br>ANO 2026</div>
+      <div class="title">RELATÓRIO DE FALTAS NA FORMAÇÃO CONTINUADA<br>ANO 2026</div>
     </div>
     <div class="header-col col-right"></div>
   </div>
@@ -105,18 +136,30 @@
   <table class="data-table">
     <thead>
       <tr>
-        <th style="width: 18%;">NOME COMPLETO</th>
-        <th style="width: 10%;">GRUPO</th>
-        <th style="width: 6%;">DATA</th>
-        <th style="width: 8%;">FREQUÊNCIA</th>
-        <th style="width: 6%;">CARGA HORÁRIA</th>
-        <th style="width: 6%;">DATA</th>
-        <th style="width: 8%;">FREQUÊNCIA</th>
-        <th style="width: 6%;">CARGA HORÁRIA</th>
-        <th style="width: 6%;">DATA</th>
-        <th style="width: 8%;">FREQUÊNCIA</th>
-        <th style="width: 6%;">CARGA HORÁRIA</th>
-        <th style="width: 12%;">OBSERVAÇÃO</th>
+        <th style="width: 15%;">NOME COMPLETO</th>
+        <th style="width: 9%;">GRUPO</th>
+        
+        <!-- Terno 1 -->
+        <th style="width: 4.5%;">DATA</th>
+        <th style="width: 7.5%;">FREQUÊNCIA</th>
+        <th style="width: 4.5%;">CARGA<br>HORÁRIA</th>
+        
+        <!-- Terno 2 -->
+        <th style="width: 4.5%;">DATA</th>
+        <th style="width: 7.5%;">FREQUÊNCIA</th>
+        <th style="width: 4.5%;">CARGA<br>HORÁRIA</th>
+        
+        <!-- Terno 3 -->
+        <th style="width: 4.5%;">DATA</th>
+        <th style="width: 7.5%;">FREQUÊNCIA</th>
+        <th style="width: 4.5%;">CARGA<br>HORÁRIA</th>
+        
+        <!-- Terno 4 -->
+        <th style="width: 4.5%;">DATA</th>
+        <th style="width: 7.5%;">FREQUÊNCIA</th>
+        <th style="width: 4.5%;">CARGA<br>HORÁRIA</th>
+        
+        <th style="width: 10%;">OBSERVAÇÃO</th>
       </tr>
     </thead>
     <tbody>
@@ -124,16 +167,29 @@
       <tr>
         <td style="text-align: left;"><?= row[0] ?></td>
         <td><?= row[1] ?></td>
+        
+        <!-- Terno 1 -->
         <td><?= row[2] ?></td>
         <td><?= row[3] ?></td>
         <td><?= row[4] ?></td>
+        
+        <!-- Terno 2 -->
         <td><?= row[5] ?></td>
         <td><?= row[6] ?></td>
         <td><?= row[7] ?></td>
+        
+        <!-- Terno 3 -->
         <td><?= row[8] ?></td>
         <td><?= row[9] ?></td>
         <td><?= row[10] ?></td>
+        
+        <!-- Terno 4 -->
         <td><?= row[11] ?></td>
+        <td><?= row[12] ?></td>
+        <td><?= row[13] ?></td>
+        
+        <!-- Observação -->
+        <td><?= row[14] ?></td>
       </tr>
       <? }); ?>
     </tbody>
@@ -171,7 +227,7 @@
     <div class="header">
       <div class="header-col col-left">
         <img src="<?!= logo ?>" class="logo">
-        <div style="font-size: 9px;">
+        <div style="font-size: 8.5px;">
           <span class="bold">PREFEITURA DE SÃO JOSÉ</span><br>
           <span class="bold">SECRETARIA MUNICIPAL DE EDUCAÇÃO</span><br>
           <span class="bold">SETOR PEDAGÓGICO</span><br>
@@ -179,16 +235,16 @@
         </div>
       </div>
       <div class="header-col col-center">
-        <div class="title">ANEXO DE OBSERVAÇÕES<br>RELATORIO DE FALTAS</div>
+        <div class="title">ANEXO DE OBSERVAÇÕES<br>RELATÓRIO DE FALTAS</div>
       </div>
       <div class="header-col col-right"></div>
     </div>
 
-    <div style="margin-top: 20px; font-size: 10px;">
-      <div class="bold" style="margin-bottom: 15px; font-size: 11px;">OBSERVAÇÕES DETALHADAS:</div>
+    <div style="margin-top: 20px; font-size: 9.5px;">
+      <div class="bold" style="margin-bottom: 12px; font-size: 10.5px;">OBSERVAÇÕES DETALHADAS:</div>
       
       <? notas.forEach(nota => { ?>
-        <div style="margin-bottom: 12px; text-align: justify; border-bottom: 1px dashed #ccc; padding-bottom: 8px;">
+        <div style="margin-bottom: 10px; text-align: justify; border-bottom: 1px dashed #ccc; padding-bottom: 6px;">
           <span class="bold">Nota <?= nota.numero ?> (Servidor: <?= nota.nome ?>):</span> <?= nota.texto ?>
         </div>
       <? }); ?>
