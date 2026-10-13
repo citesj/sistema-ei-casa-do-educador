@@ -19,6 +19,7 @@
       line-height: 1.2;
       -webkit-print-color-adjust: exact;
       margin: 0;
+      padding: 0 2px;
     }
 
     .header {
@@ -33,7 +34,7 @@
     }
 
     .col-left {
-      width: 35%
+      width: 35%;
     }
 
     .col-center {
@@ -165,14 +166,14 @@
     const EXTRAS_FIM = 10; 
 
     // Constantes
-    const ANO_ATUAL = new Date().getFullYear()
+    const ANO_ATUAL = new Date().getFullYear();
 
     // Tratamento da exibição da Unidade
     let isUnidadeMultiSelected = m.unidade && m.unidade.includes(',');
     let displayUnidade = isUnidadeMultiSelected ? 'Múltiplas Unidades (ver rodapé)' : m.unidade;
 
     // Tratamento da exibição do filtro de função
-    let isRoleFilterMultiSelected = m.funcao && m.funcao.includes(',')
+    let isRoleFilterMultiSelected = m.funcao && m.funcao.includes(',');
     let displayFuncao = isRoleFilterMultiSelected ? 'Múltiplas Funções (ver rodapé)' : m.funcao;
 
     // Preparação dos dados
@@ -256,7 +257,7 @@
         <td style="text-align:left">
           <?!= record.nome || '&nbsp;' ?>
         </td>
-        <td style="text-align:left">
+        <td>
           <?!= record.local || '&nbsp;' ?>
         </td>
         <td>
