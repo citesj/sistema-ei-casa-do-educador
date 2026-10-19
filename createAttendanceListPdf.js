@@ -45,11 +45,12 @@ function createAttendancePdf() {
 
     // 2. Renderização
     const htmlOutput = montarHtmlLista(metadados, registros);
-    const pdfBlob = converterParaPdf(htmlOutput, metadados.unidade);
+    const pdfBlob = converterParaPdf(htmlOutput);
 
     return {
       fileData: Utilities.base64Encode(pdfBlob.getBytes()),
       fileName: pdfBlob.getName(),
+      fileExtension: 'pdf',
       fileExt: 'pdf'
     };
   } catch (error) {
@@ -135,7 +136,7 @@ function montarHtmlLista(metadados, registros) {
 /**
  * Converte string HTML em Blob PDF.
  */
-function converterParaPdf(html, unidade) {
+function converterParaPdf(html) {
   const blob = Utilities.newBlob(html, MimeType.HTML).getAs(MimeType.PDF);
   const data = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd-MM-yyyy_HH-mm");
   return blob.setName(`${data}_${CONFIG_LISTA_FREQUENCIA.STRINGS.PREFIXO_ARQUIVO}.pdf`);

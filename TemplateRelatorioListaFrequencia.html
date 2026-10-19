@@ -10,7 +10,12 @@
 
     @page {
       size: A4 landscape;
-      margin: 0.8cm;
+      margin: 0.8cm 0.8cm 1.2cm;
+
+      @bottom-right {
+        content: "Página " counter(page) " de " counter(pages);
+        font-size: 9px;
+      }
     }
 
     body {
@@ -26,6 +31,8 @@
       width: 100%;
       margin-bottom: 10px;
       display: table;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
 
     .header-col {
@@ -64,6 +71,8 @@
       width: 100%;
       clear: both;
       font-size: 10px;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
 
     .bold {
@@ -92,6 +101,25 @@
       table-layout: fixed;
     }
 
+    /* The print renderer repeats the table header on each page. */
+    thead {
+      display: table-header-group;
+    }
+
+    tfoot {
+      display: table-footer-group;
+    }
+
+    tbody tr {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    tfoot tr {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
     th {
       background-color: <?=theme.headerColor ?> !important;
       color: <?=theme.textColor ?>;
@@ -107,52 +135,16 @@
       font-size: 9px;
       height: 26px;
       word-wrap: break-word;
+      overflow-wrap: break-word;
     }
 
-    .page-footer {
-      width: 100%;
-      margin-top: 8px;
-      display: table;
-    }
-
-    .footer-info {
-      display: table-cell;
+    .table-footer {
       text-align: left;
       font-style: italic;
       color: #333;
       font-size: 8px;
-      width: 85%;
-      vertical-align: bottom;
-    }
-
-    .footer-units {
-      text-align: left;
-      font-style: italic;
-      color: #333;
-      font-size: 8px;
-      vertical-align: bottom;
-      margin-bottom: 2px;
-    }
-
-    .footer-roles {
-      text-align: left;
-      font-style: italic;
-      color: #333;
-      font-size: 8px;
-      vertical-align: bottom;
-    }
-
-    .footer-page {
-      display: table-cell;
-      text-align: right;
-      font-size: 9px;
-      font-weight: bold;
-      width: 15%;
-      vertical-align: bottom;
-    }
-
-    .page-break {
-      page-break-after: always;
+      border: 0;
+      padding: 5px 0 0;
     }
   </style>
 </head>
@@ -160,43 +152,15 @@
 <body>
 
   <? 
-    // Configurações de Layout
-    const MAX_LINHAS_P1 = 14; 
-    const MAX_LINHAS_EXTRAS = 16; 
-    const EXTRAS_FIM = 10; 
-
-    // Constantes
     const ANO_ATUAL = new Date().getFullYear();
-
-    // Tratamento da exibição da Unidade
-    let isUnidadeMultiSelected = m.unidade && m.unidade.includes(',');
-    let displayUnidade = isUnidadeMultiSelected ? 'Múltiplas Unidades (ver rodapé)' : m.unidade;
-
-    // Tratamento da exibição do filtro de função
-    let isRoleFilterMultiSelected = m.funcao && m.funcao.includes(',');
-    let displayFuncao = isRoleFilterMultiSelected ? 'Múltiplas Funções (ver rodapé)' : m.funcao;
-
-    // Preparação dos dados
-    let listaFinal = dados.map(dado => ({
-      nome: dado.nome, local: dado.local, cpf: dado.cpf, funcao: dado.funcao, obs: dado.obs
-    }));
-
-    // Injeção de linhas em branco obrigatórias
-    for (let i = 0; i < EXTRAS_FIM; i++) {
-      listaFinal.push({ nome: '', local: '', cpf: '', funcao: '', obs: '' });
-    }
-
-    let totalPaginas = 1;
-    if (listaFinal.length > MAX_LINHAS_P1) {
-      totalPaginas += Math.ceil((listaFinal.length - MAX_LINHAS_P1) / MAX_LINHAS_EXTRAS);
-    }
-
-    let cursor = 0;
-    for (let p = 0; p < totalPaginas; p++) { 
-      let isFirstPage = (p === 0);
-      let limite = isFirstPage ? MAX_LINHAS_P1 : MAX_LINHAS_EXTRAS;
-      let records = listaFinal.slice(cursor, cursor + limite);
-      cursor += limite;
+    const isUnidadeMultiSelected = m.unidade && m.unidade.includes(',');
+    const displayUnidade = isUnidadeMultiSelected
+      ? 'Múltiplas Unidades (ver rodapé)'
+      : m.unidade;
+    const isRoleFilterMultiSelected = m.funcao && m.funcao.includes(',');
+    const displayFuncao = isRoleFilterMultiSelected
+      ? 'Múltiplas Funções (ver rodapé)'
+      : m.funcao;
   ?>
 
   <div class="header">
@@ -216,13 +180,12 @@
       <span class="bold">Grupo:</span>
       <?= m.grupo ?><br>
       <span class="bold">Unidade:</span>
-      <?= displayUnidade ?><br>  
+      <?= displayUnidade ?><br>
       <span class="bold">Função:</span>
       <?= displayFuncao ?>
     </div>
   </div>
 
-  <? if (isFirstPage) { ?>
   <div class="row">
     <span class="bold">Data da Formação:</span>
     <span class="date-slot">&nbsp;</span>/
@@ -237,7 +200,6 @@
     <span class="bold">Formador(a):</span> <span class="line" style="width:300px"></span>
     <span class="bold" style="margin-left:20px">Representante SME:</span> <span class="line" style="width:300px"></span>
   </div>
-  <? } ?>
 
   <table>
     <thead>
@@ -252,52 +214,33 @@
       </tr>
     </thead>
     <tbody>
-      <? records.forEach(record => { ?>
+      <? dados.forEach(record => { ?>
       <tr>
-        <td style="text-align:left">
-          <?!= record.nome || '&nbsp;' ?>
-        </td>
-        <td>
-          <?!= record.local || '&nbsp;' ?>
-        </td>
-        <td>
-          <?!= record.cpf || '&nbsp;' ?>
-        </td>
-        <td>
-          <?!= record.funcao || '&nbsp;' ?>
-        </td>
+        <td style="text-align:left"><?!= record.nome ?></td>
+        <td><?!= record.local ?></td>
+        <td><?= record.cpf ?></td>
+        <td><?= record.funcao ?></td>
         <td></td>
         <td></td>
-        <td>
-          <?!= record.obs || '&nbsp;' ?>
-        </td>
+        <td><?= record.obs ?></td>
       </tr>
       <? }); ?>
     </tbody>
+    <? if (isUnidadeMultiSelected || isRoleFilterMultiSelected) { ?>
+    <tfoot>
+      <tr>
+        <td colspan="7" class="table-footer">
+          <? if (isUnidadeMultiSelected) { ?>
+            <div>Unidades filtradas: <?= m.unidade ?></div>
+          <? } ?>
+          <? if (isRoleFilterMultiSelected) { ?>
+            <div>Funções filtradas: <?= m.funcao ?></div>
+          <? } ?>
+        </td>
+      </tr>
+    </tfoot>
+    <? } ?>
   </table>
-
-  <div class="page-footer">
-    <div class="footer-info">
-      <div class="footer-units">
-        <? if (isUnidadeMultiSelected) { ?>
-          Unidades filtradas: <?= m.unidade ?>
-        <? } ?>
-      </div>
-      <div class="footer-roles">
-        <? if (isRoleFilterMultiSelected) { ?>
-          Funções filtradas: <?= m.funcao ?>
-        <? } ?>
-      </div>
-    </div>
-    <div class="footer-page">
-      Página <?= p + 1 ?> de <?= totalPaginas ?>
-    </div>
-  </div>
-
-  <? if (p < totalPaginas - 1) { ?>
-  <div class="page-break"></div>
-  <? } ?>
-  <? } ?>
 
 </body>
 
