@@ -7,69 +7,157 @@
       box-sizing: border-box;
     }
 
-    @page { 
-      size: A4 landscape; 
-      margin: 0.5cm; 
+    @page {
+      size: A4 landscape;
+      margin: 0.5cm 0.5cm 1.2cm;
+
+      @bottom-right {
+        content: "Página " counter(page) " de " counter(pages);
+        font-size: 8.5px;
+      }
     }
-    
-    body { 
-      font-family: <?= theme.fontFamily ?>; 
-      font-size: <?= theme.baseFontSize ?>; 
-      line-height: 1.2; 
-      -webkit-print-color-adjust: exact; 
+
+    body {
+      font-family: <?= theme.fontFamily ?>;
+      font-size: <?= theme.baseFontSize ?>;
+      line-height: 1.2;
+      -webkit-print-color-adjust: exact;
       margin: 0;
       padding: 0;
       width: 100%;
     }
-    
-    /* Cabeçalho Institucional */
-    .header { width: 100%; margin-bottom: 8px; display: table; }
-    .header-col { display: table-cell; vertical-align: middle; }
-    .col-left { width: 35%; }
-    .col-center { width: 30%; text-align: center; }
-    .col-right { width: 35%; text-align: right; }
-    .logo { float: left; width: 48px; height: 48px; margin-right: 8px; }
-    .title { font-size: 12px; font-weight: bold; }
-    
-    /* Metadados */
-    .meta-box { margin-bottom: 6px; font-size: 9.5px; }
-    .bold { font-weight: bold; }
-    
-    /* Tabela de Dados */
-    table.data-table { 
-      width: 100%; 
-      border-collapse: collapse; 
-      margin-top: 4px; 
-      table-layout: fixed; 
+
+    .report-table,
+    .notes-table,
+    .signature-section {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
     }
-    table.data-table th { 
-      background-color: <?= theme.headerColor ?> !important; 
-      color: <?= theme.textColor ?>; 
-      border: 1px solid #000; 
-      padding: 3px 1px; 
-      font-size: 7px; 
+
+    /* Metadata and column headings repeat with the automatically paginated table. */
+    .report-table thead,
+    .notes-table thead {
+      display: table-header-group;
+    }
+
+    .report-table tfoot {
+      display: table-footer-group;
+    }
+
+    .report-table tbody tr,
+    .report-table tfoot tr {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    .institutional-heading {
+      padding: 0 0 8px;
+      text-align: left;
+    }
+
+    .header {
+      width: 100%;
+      display: table;
+    }
+
+    .header-col {
+      display: table-cell;
+      vertical-align: middle;
+    }
+
+    .col-left {
+      width: 35%;
+    }
+
+    .col-center {
+      width: 30%;
+      text-align: center;
+    }
+
+    .col-right {
+      width: 35%;
+      text-align: right;
+    }
+
+    .logo {
+      float: left;
+      width: 48px;
+      height: 48px;
+      margin-right: 8px;
+    }
+
+    .institution {
+      font-size: 8.5px;
+      font-weight: bold;
+    }
+
+    .title {
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .report-table th.meta {
+      padding: 0 0 6px;
+      text-align: left;
+      font-size: 9.5px;
+      font-weight: normal;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    .report-table th,
+    .notes-table th {
+      border: 1px solid #000;
+      padding: 3px 1px;
+      font-size: 7px;
       line-height: 1.1;
+    }
+
+    .report-table th.institutional-heading,
+    .report-table th.meta,
+    .notes-table th.institutional-heading,
+    .notes-table th.notes-heading {
+      border: 0;
+    }
+
+    .report-table th.column-heading {
+      background-color: <?= theme.headerColor ?> !important;
+      color: <?= theme.textColor ?>;
       word-wrap: break-word;
       overflow-wrap: break-word;
     }
-    table.data-table td { 
-      border: 1px solid #000; 
-      padding: 2px 1px; 
-      text-align: center; 
-      font-size: 7px; 
-      height: 20px; 
-      word-wrap: break-word; 
+
+    .report-table td {
+      border: 1px solid #000;
+      padding: 2px 1px;
+      text-align: center;
+      font-size: 7px;
+      height: 20px;
+      word-wrap: break-word;
       overflow-wrap: break-word;
     }
-    
-    /* Seção de Assinaturas */
-    .signature-section { 
-      width: 100%; 
-      border-collapse: collapse; 
-      margin-top: 12px; 
-      page-break-inside: avoid; 
+
+    .report-table td.name {
+      text-align: left;
     }
-    .sig-cell {
+
+    .signature-cell {
+      padding: 12px 6px 0;
+      vertical-align: bottom;
+    }
+
+    .signature-section {
+      margin-top: 2px;
+    }
+
+    .report-table td.signature-cell {
+      border: 0;
+    }
+
+    .signature-section td.sig-cell {
       width: 50%;
       border: 1px solid #000;
       vertical-align: bottom;
@@ -78,177 +166,186 @@
       text-align: center;
       font-size: 8.5px;
     }
-    .sig-image { max-height: 50px; width: auto; display: block; margin: 0 auto 4px auto; }
-    
-    .page-footer { text-align: right; font-size: 8.5px; margin-top: 4px; font-weight: bold; }
-    .page-break { page-break-after: always; }
+
+    .sig-image {
+      max-height: 50px;
+      width: auto;
+      display: block;
+      margin: 0 auto 4px;
+    }
+
+    .notes-table .institutional-heading,
+    .notes-table .notes-heading {
+      padding: 0;
+    }
+
+    .notes-page {
+      page-break-before: always;
+      break-before: page;
+    }
+
+    .notes-heading {
+      border: 0;
+      padding: 0 0 12px;
+      text-align: center;
+      font-size: 10.5px;
+      font-weight: bold;
+    }
+
+    .note-cell {
+      border: 0;
+      padding: 0 0 10px;
+      text-align: justify;
+      font-size: 9.5px;
+    }
+
+    .note-content {
+      border-bottom: 1px dashed #ccc;
+      padding-bottom: 6px;
+    }
   </style>
 </head>
 <body>
 
   <? 
-    // === CALIBRAÇÃO DE LINHAS (Segurança para o Rodapé) ===
-    const LINHAS_PAGINA_1 = 14; 
-    const LINHAS_PAGINAS_EXTRAS = 16; 
-    
-    let totalRecords = dados.length;
-    let totalPaginas = 1;
-    if (totalRecords > LINHAS_PAGINA_1) {
-      totalPaginas += Math.ceil((totalRecords - LINHAS_PAGINA_1) / LINHAS_PAGINAS_EXTRAS);
-    }
-
-    let indiceAtual = 0;
-
-    for (let p = 0; p < totalPaginas; p++) { 
-      let isPrimeiraPagina = (p === 0);
-      let limiteLinhas = isPrimeiraPagina ? LINHAS_PAGINA_1 : LINHAS_PAGINAS_EXTRAS;
-      
-      let dadosPagina = dados.slice(indiceAtual, indiceAtual + limiteLinhas);
-      indiceAtual += limiteLinhas;
+    const reportHeader = (title) => `
+      <div class="header">
+        <div class="header-col col-left">
+          <img src="${logo}" class="logo">
+          <div class="institution">
+            PREFEITURA DE SÃO JOSÉ<br>
+            SECRETARIA MUNICIPAL DE EDUCAÇÃO<br>
+            SETOR PEDAGÓGICO<br>
+            CASA DO EDUCADOR
+          </div>
+        </div>
+        <div class="header-col col-center">
+          <div class="title">${title}</div>
+        </div>
+        <div class="header-col col-right"></div>
+      </div>`;
   ?>
 
-  <div class="header">
-    <div class="header-col col-left">
-      <img src="<?!= logo ?>" class="logo">
-      <div style="font-size: 8.5px;">
-          <span class="bold">PREFEITURA DE SÃO JOSÉ</span><br>
-          <span class="bold">SECRETARIA MUNICIPAL DE EDUCAÇÃO</span><br>
-          <span class="bold">SETOR PEDAGÓGICO</span><br>
-          <span class="bold">CASA DO EDUCADOR</span>
-      </div>
-    </div>
-    <div class="header-col col-center">
-      <div class="title">RELATÓRIO DE FALTAS NA FORMAÇÃO CONTINUADA<br>ANO 2026</div>
-    </div>
-    <div class="header-col col-right"></div>
-  </div>
-
-  <? if (isPrimeiraPagina) { ?>
-    <div class="meta-box">
-      <span class="bold">PERÍODO:</span> <?= m.periodo ?><br>
-      <span class="bold">UNIDADE DE ENSINO:</span> <?= m.unidade ?><br>
-      <span class="bold">DATA DO ENVIO:</span> <?= m.dataEnvio ?>
-    </div>
-  <? } else { ?>
-    <div style="height: 10px;"></div>
-  <? } ?>
-
-  <table class="data-table">
+  <table class="report-table">
+    <colgroup>
+      <col style="width: 15%;">
+      <col style="width: 9%;">
+      <col style="width: 4.5%;">
+      <col style="width: 7.5%;">
+      <col style="width: 4.5%;">
+      <col style="width: 4.5%;">
+      <col style="width: 7.5%;">
+      <col style="width: 4.5%;">
+      <col style="width: 4.5%;">
+      <col style="width: 7.5%;">
+      <col style="width: 4.5%;">
+      <col style="width: 4.5%;">
+      <col style="width: 7.5%;">
+      <col style="width: 4.5%;">
+      <col style="width: 10%;">
+    </colgroup>
     <thead>
       <tr>
-        <th style="width: 15%;">NOME COMPLETO</th>
-        <th style="width: 9%;">GRUPO</th>
-        
-        <!-- Terno 1 -->
-        <th style="width: 4.5%;">DATA</th>
-        <th style="width: 7.5%;">FREQUÊNCIA</th>
-        <th style="width: 4.5%;">CARGA<br>HORÁRIA</th>
-        
-        <!-- Terno 2 -->
-        <th style="width: 4.5%;">DATA</th>
-        <th style="width: 7.5%;">FREQUÊNCIA</th>
-        <th style="width: 4.5%;">CARGA<br>HORÁRIA</th>
-        
-        <!-- Terno 3 -->
-        <th style="width: 4.5%;">DATA</th>
-        <th style="width: 7.5%;">FREQUÊNCIA</th>
-        <th style="width: 4.5%;">CARGA<br>HORÁRIA</th>
-        
-        <!-- Terno 4 -->
-        <th style="width: 4.5%;">DATA</th>
-        <th style="width: 7.5%;">FREQUÊNCIA</th>
-        <th style="width: 4.5%;">CARGA<br>HORÁRIA</th>
-        
-        <th style="width: 10%;">OBSERVAÇÃO</th>
+        <th colspan="15" class="institutional-heading">
+          <?!= reportHeader('RELATÓRIO DE FALTAS NA FORMAÇÃO CONTINUADA<br>ANO 2026') ?>
+        </th>
+      </tr>
+      <tr>
+        <th colspan="15" class="meta">
+          <span class="bold">PERÍODO:</span> <?= m.periodo ?><br>
+          <span class="bold">UNIDADE DE ENSINO:</span> <?= m.unidade ?><br>
+          <span class="bold">DATA DO ENVIO:</span> <?= m.dataEnvio ?>
+        </th>
+      </tr>
+      <tr>
+        <th class="column-heading">NOME COMPLETO</th>
+        <th class="column-heading">GRUPO</th>
+        <th class="column-heading">DATA</th>
+        <th class="column-heading">FREQUÊNCIA</th>
+        <th class="column-heading">CARGA<br>HORÁRIA</th>
+        <th class="column-heading">DATA</th>
+        <th class="column-heading">FREQUÊNCIA</th>
+        <th class="column-heading">CARGA<br>HORÁRIA</th>
+        <th class="column-heading">DATA</th>
+        <th class="column-heading">FREQUÊNCIA</th>
+        <th class="column-heading">CARGA<br>HORÁRIA</th>
+        <th class="column-heading">DATA</th>
+        <th class="column-heading">FREQUÊNCIA</th>
+        <th class="column-heading">CARGA<br>HORÁRIA</th>
+        <th class="column-heading">OBSERVAÇÃO</th>
       </tr>
     </thead>
     <tbody>
-      <? dadosPagina.forEach(row => { ?>
+      <? dados.forEach(row => { ?>
       <tr>
-        <td style="text-align: left;"><?= row[0] ?></td>
+        <td class="name"><?= row[0] ?></td>
         <td><?= row[1] ?></td>
-        
-        <!-- Terno 1 -->
         <td><?= row[2] ?></td>
         <td><?= row[3] ?></td>
         <td><?= row[4] ?></td>
-        
-        <!-- Terno 2 -->
         <td><?= row[5] ?></td>
         <td><?= row[6] ?></td>
         <td><?= row[7] ?></td>
-        
-        <!-- Terno 3 -->
         <td><?= row[8] ?></td>
         <td><?= row[9] ?></td>
         <td><?= row[10] ?></td>
-        
-        <!-- Terno 4 -->
         <td><?= row[11] ?></td>
         <td><?= row[12] ?></td>
         <td><?= row[13] ?></td>
-        
-        <!-- Observação -->
         <td><?= row[14] ?></td>
       </tr>
       <? }); ?>
     </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="15" class="signature-cell">
+          <table class="signature-section">
+            <tr>
+              <td class="sig-cell">
+                <img src="<?!= assinaturaCasaEducador ?>" class="sig-image">
+                <div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div>
+                <span class="bold">Assinatura e Carimbo da Casa do Educador</span><br>
+                Setor Pedagógico
+              </td>
+              <td class="sig-cell">
+                <div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div>
+                <span class="bold">Assinatura e Carimbo da Unidade Escolar</span><br>
+                Diretor(a)
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </tfoot>
   </table>
 
-  <table class="signature-section">
-    <tr>
-      <td class="sig-cell">
-        <img src="<?!= assinaturaCasaEducador ?>" class="sig-image">
-        <div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div>
-        <span class="bold">Assinatura e Carimbo da Casa do Educador</span><br>
-        Setor Pedagógico
-      </td>
-      <td class="sig-cell">
-        <div style="border-top: 1px solid #000; width: 80%; margin: 0 auto;"></div>
-        <span class="bold">Assinatura e Carimbo da Unidade Escolar</span><br>
-        Diretor(a)
-      </td>
-    </tr>
-  </table>
-
-  <div class="page-footer">
-    Página <?= p + 1 ?> de <?= totalPaginas ?>
+  <? if (notas && notas.length > 0) { ?>
+  <div class="notes-page">
+    <table class="notes-table">
+      <thead>
+        <tr>
+          <th class="institutional-heading">
+            <?!= reportHeader('ANEXO DE OBSERVAÇÕES<br>RELATÓRIO DE FALTAS') ?>
+          </th>
+        </tr>
+        <tr>
+          <th class="notes-heading">OBSERVAÇÕES DETALHADAS:</th>
+        </tr>
+      </thead>
+      <tbody>
+        <? notas.forEach(nota => { ?>
+        <tr>
+          <td class="note-cell">
+            <div class="note-content">
+              <span class="bold">Nota <?= nota.numero ?> (Servidor: <?= nota.nome ?>):</span>
+              <?= nota.texto ?>
+            </div>
+          </td>
+        </tr>
+        <? }); ?>
+      </tbody>
+    </table>
   </div>
-
-  <? if (p < totalPaginas - 1) { ?>
-    <div class="page-break"></div>
-  <? } ?>
-
-  <? } /* Fim do Loop de Páginas */ ?>
-
-<? if (notas && notas.length > 0) { ?>
-    <div class="page-break"></div>
-
-    <div class="header">
-      <div class="header-col col-left">
-        <img src="<?!= logo ?>" class="logo">
-        <div style="font-size: 8.5px;">
-          <span class="bold">PREFEITURA DE SÃO JOSÉ</span><br>
-          <span class="bold">SECRETARIA MUNICIPAL DE EDUCAÇÃO</span><br>
-          <span class="bold">SETOR PEDAGÓGICO</span><br>
-          <span class="bold">CASA DO EDUCADOR</span>
-        </div>
-      </div>
-      <div class="header-col col-center">
-        <div class="title">ANEXO DE OBSERVAÇÕES<br>RELATÓRIO DE FALTAS</div>
-      </div>
-      <div class="header-col col-right"></div>
-    </div>
-
-    <div style="margin-top: 20px; font-size: 9.5px;">
-      <div class="bold" style="margin-bottom: 12px; font-size: 10.5px;">OBSERVAÇÕES DETALHADAS:</div>
-      
-      <? notas.forEach(nota => { ?>
-        <div style="margin-bottom: 10px; text-align: justify; border-bottom: 1px dashed #ccc; padding-bottom: 6px;">
-          <span class="bold">Nota <?= nota.numero ?> (Servidor: <?= nota.nome ?>):</span> <?= nota.texto ?>
-        </div>
-      <? }); ?>
-    </div>
   <? } ?>
 
 </body>
